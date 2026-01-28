@@ -1,5 +1,6 @@
 import { ChannelType } from 'discord.js';
 import { verifyPlayer } from '../utils/verifyPlayer.js';
+import { checkRunewatch } from '../utils/checkRunewatch.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,6 +10,7 @@ const __dirname = path.dirname(__filename);
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, '../../config.json'), 'utf-8'));
 
 const HELPER_ROLE_ID = config.roles.helper;
+const MOD_ROLE_ID = config.roles.mod;
 const VERIFY_CHANNELS = [config.channels.verify, config.channels.test];
 const BOTLOGS_CHANNEL_ID = config.channels.botlogs;
 
@@ -159,11 +161,28 @@ export default {
     const response = await thread.send({ embeds: [result.embed] });
     logBoth('VERIFY', `Sent verification embed - Status: ${result.success ? 'PASSED' : 'FAILED'}`, logs);
 
-    // If passed, notify helper
+    // If passed, notify helper and check runewatch
     if (result.success) {
       logBoth('VERIFY', `Player passed! Notifying Helper`, logs);
       await thread.send(`✅ Stats and KC verified! A Helper will check your gear shortly!`);
-      await sendBotLog(message.client, `✅ **${result.playerName}** (${message.author.username}) - PASSED\n\`\`\`\n${logs.join('\n')}\n\`\`\``);
+      
+      // Check runewatch status
+      logBoth('VERIFY', `Checking RuneWatch for ${result.playerName}`, logs);
+      const rwCheck = await checkRunewatch(thread, result.playerName, message.client);
+      
+      if (rwCheck.onList) {
+        logBoth('VERIFY', `⚠️ ${result.playerName} is FLAGGED on RuneWatch`, logs);
+        const modRole = await message.guild.roles.fetch(MOD_ROLE_ID);
+        const logsChannel = await message.client.channels.fetch(BOTLOGS_CHANNEL_ID);
+        
+        if (logsChannel) {
+          let modPing = modRole ? `${modRole} ` : '';
+          await logsChannel.send(`⚠️ ${modPing}**${result.playerName}** (${message.author.username}) - FLAGGED on RuneWatch\n\`\`\`\n${logs.join('\n')}\n\`\`\``);
+        }
+      } else {
+        logBoth('VERIFY', `✅ ${result.playerName} - Clean on RuneWatch`, logs);
+        await sendBotLog(message.client, `✅ **${result.playerName}** (${message.author.username}) - PASSED\n\`\`\`\n${logs.join('\n')}\n\`\`\``);
+      }
     } else {
       logBoth('VERIFY', `Player failed verification`, logs);
       await thread.send(`Unfortunately you don't meet the HMT requirements.`);
