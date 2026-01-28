@@ -6,7 +6,8 @@ import path from 'path';
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
   ]
 });
 
@@ -19,6 +20,15 @@ const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('
 for (const file of commandFiles) {
   const command = await import(`./commands/${file}`);
   client.commands.set(command.default.data.name, command.default);
+}
+
+// --- Automatically load all events ---
+const eventsPath = path.join('./src/events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+for (const file of eventFiles) {
+  const event = await import(`./events/${file}`);
+  client.on(event.default.name, (...args) => event.default.execute(...args));
 }
 
 client.once('clientReady', () => {
