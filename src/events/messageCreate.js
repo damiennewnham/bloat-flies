@@ -76,7 +76,7 @@ export default {
     logBoth('VERIFY', `Created thread: ${thread.id}`, logs);
 
     // Always prompt for IGN first
-    await thread.send(`⏳ Hi **${message.author.username}**, please reply with your OSRS IGN to verify:`);
+    await thread.send(`⏳ ${message.author} please reply with your OSRS IGN to verify:`);
 
     let result;
     let ign;
@@ -105,7 +105,7 @@ export default {
           logBoth('VERIFY', `Error on attempt ${attempts + 1}: ${result.error}`, logs);
           attempts++;
           if (attempts < maxAttempts) {
-            await thread.send(`❌ ${result.error}\n\nPlease try again:`);
+            await thread.send(`❌ ${result.error}\n\n${message.author} please try again:`);
             continue;
           } else {
             await thread.send(`❌ Unable to verify your account after ${maxAttempts} attempts. A Helper will respond shortly.`);
