@@ -1,4 +1,4 @@
-# Bloat-Flies Discord Bot
+# Bloat-Flies Discord Bot not by root
 
 A Discord bot for HMT Learner Hub communitity, focused on verifying player eligibility for HMT/TOB learner hubs, with automatic gear screenshot detection, RuneWatch integration, and detailed logging.
 
