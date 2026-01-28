@@ -43,8 +43,8 @@ export default {
 
     // Get the user's server nickname or username
     const member = await message.guild.members.fetch(message.author.id);
-    let displayName = member.nickname || message.author.username;
-    console.log(`[VERIFY] Discord name: ${displayName}`);
+    let displayName = member.nickname !== null ? member.nickname : message.author.username;
+    console.log(`[VERIFY] Discord name: ${displayName} (nickname: ${member.nickname}, username: ${message.author.username})`);
 
     // Create a thread for verification
     const thread = await message.startThread({
