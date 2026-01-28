@@ -1,12 +1,13 @@
-// Check runewatch status by querying the cases API
+// Check runewatch status via the mixedlist API
 export async function checkRunewatch(playerIGN) {
   try {
     console.log(`[RUNEWATCH] Checking ${playerIGN} against RuneWatch...`);
     
-    // Query RuneWatch cases endpoint - they likely have an API for cases
-    const response = await fetch(`https://runewatch.com/api/cases`, {
+    // Query RuneWatch mixedlist API
+    const response = await fetch(`https://runewatch.com/api/cases/mixedlist`, {
       method: 'GET',
       headers: {
+        'Accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       }
     });
@@ -18,16 +19,14 @@ export async function checkRunewatch(playerIGN) {
     
     const cases = await response.json();
     
-    // Search through all cases for matching player
+    // Search through mixedlist array for matching player
     if (Array.isArray(cases)) {
       const playerCase = cases.find(c => 
-        c.player?.toLowerCase() === playerIGN.toLowerCase() ||
-        c.rsn?.toLowerCase() === playerIGN.toLowerCase() ||
-        c.victim?.toLowerCase() === playerIGN.toLowerCase()
+        c.accused_rsn?.toLowerCase() === playerIGN.toLowerCase()
       );
       
       if (playerCase) {
-        console.log(`[RUNEWATCH] ${playerIGN} - FLAGGED on RuneWatch`);
+        console.log(`[RUNEWATCH] ${playerIGN} - FLAGGED on RuneWatch (${playerCase.reason})`);
         return { 
           onList: true, 
           data: playerCase
