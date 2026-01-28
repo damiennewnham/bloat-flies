@@ -41,10 +41,10 @@ export default {
 
     console.log(`[VERIFY] Processing verification for ${message.author.username} in channel ${message.channelId}`);
 
-    // Get the user's server nickname or username
+    // Get the user's server nickname, global name, or username
     const member = await message.guild.members.fetch(message.author.id);
-    let displayName = member.nickname !== null ? member.nickname : message.author.username;
-    console.log(`[VERIFY] Discord name: ${displayName} (nickname: ${member.nickname}, username: ${message.author.username})`);
+    let displayName = member.nickname || member.user.globalName || message.author.username;
+    console.log(`[VERIFY] Discord name: ${displayName} (nickname: ${member.nickname}, globalName: ${member.user.globalName}, username: ${message.author.username})`);
 
     // Create a thread for verification
     const thread = await message.startThread({
