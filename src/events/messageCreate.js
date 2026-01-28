@@ -1,6 +1,6 @@
 import { ChannelType } from 'discord.js';
 import { verifyPlayer } from '../utils/verifyPlayer.js';
-import { checkRunewatch } from '../utils/checkRunewatch.js';
+import { checkRunewatch } from '../utils/checkRuneWatch.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
