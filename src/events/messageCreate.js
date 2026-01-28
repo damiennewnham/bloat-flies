@@ -129,7 +129,7 @@ export default {
               await thread.send(`❌ ${result.error}\n\nPlease try again:`);
               continue;
             } else {
-              await thread.send(`❌ Unable to verify your account after ${maxAttempts} attempts. Please contact a Helper.`);
+              await thread.send(`❌ Unable to verify your account after ${maxAttempts} attempts. A Helper will respond shortly.`);
               await sendBotLog(message.client, `\`\`\`\n${logs.join('\n')}\n\`\`\``);
               return;
             }
