@@ -31,8 +31,8 @@ for (const file of eventFiles) {
   client.on(event.default.name, (...args) => event.default.execute(...args));
 }
 
-client.once('clientReady', () => {
-  console.log(`🦆 Quackington online as ${client.user.tag}`);
+client.once('ready', () => {
+  console.log(`� Bloat-Flies online as ${client.user.tag}`);
 });
 
 client.on('interactionCreate', async interaction => {
