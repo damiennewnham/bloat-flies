@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.1] - 2026-01-28
+
+### Changed
+- **Auto-Verification Flow**
+  - Always prompts user for OSRS IGN immediately when image is posted
+  - Eliminates edge cases from Discord name resolution
+  - Updates server nickname with verified IGN
+  - Pings user in both initial prompt and retry messages
+
+---
+
 ## [1.0.0] - 2026-01-28
 
 ### Added
