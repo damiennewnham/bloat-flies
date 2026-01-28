@@ -65,88 +65,75 @@ export default {
 
     logBoth('VERIFY', `Processing verification for ${message.author.username} in channel ${message.channelId}`, logs);
 
-    // Get the user's server nickname, global name, or username
+    // Get the member object
     const member = await message.guild.members.fetch(message.author.id);
-    let displayName = member.nickname || member.user.globalName || message.author.username;
-    logBoth('VERIFY', `Discord name: ${displayName} (nickname: ${member.nickname}, globalName: ${member.user.globalName}, username: ${message.author.username})`, logs);
 
     // Create a thread for verification
     const thread = await message.startThread({
-      name: `Verifying ${displayName}`,
+      name: `Verifying ${message.author.username}`,
       autoArchiveDuration: 1440 // 24 hours
     });
     logBoth('VERIFY', `Created thread: ${thread.id}`, logs);
 
-    // Send initial message
-    await thread.send(`⏳ Verifying **${displayName}**...`);
+    // Always prompt for IGN first
+    await thread.send(`⏳ Hi **${message.author.username}**, please reply with your OSRS IGN to verify:`);
 
-    // Try to verify with their Discord name/nickname
-    logBoth('VERIFY', `Attempting verification with Discord name: ${displayName}`, logs);
-    let result = await verifyPlayer(displayName);
+    let result;
+    let ign;
+    let attempts = 0;
+    const maxAttempts = 2;
 
-    // If initial verification fails, ask for IGN
-    if (result.error) {
-      logBoth('VERIFY', `Verification failed with Discord name, requesting IGN`, logs);
-      
-      let attempts = 0;
-      const maxAttempts = 2;
-      
-      while (attempts < maxAttempts) {
-        await thread.send(
-          `${message.author} Could not find your stats as **${displayName}**. Please reply with your OSRS IGN:`
-        );
+    // Loop to get IGN and verify
+    while (attempts < maxAttempts) {
+      // Wait for user response
+      try {
+        const collected = await thread.awaitMessages({
+          filter: m => m.author.id === message.author.id,
+          max: 1,
+          time: 60000, // 1 minute timeout
+          errors: ['time']
+        });
 
-        // Wait for user response
-        try {
-          const collected = await thread.awaitMessages({
-            filter: m => m.author.id === message.author.id,
-            max: 1,
-            time: 60000, // 1 minute timeout
-            errors: ['time']
-          });
+        ign = collected.first().content.trim();
+        logBoth('VERIFY', `Received IGN (attempt ${attempts + 1}): ${ign}`, logs);
 
-          const ign = collected.first().content.trim();
-          logBoth('VERIFY', `Received IGN (attempt ${attempts + 1}): ${ign}`, logs);
+        // Verify with the provided IGN
+        logBoth('VERIFY', `Attempting verification with IGN: ${ign}`, logs);
+        result = await verifyPlayer(ign);
 
-          // Update their server nickname
-          try {
-            await member.setNickname(ign);
-            logBoth('VERIFY', `Updated nickname to: ${ign}`, logs);
-          } catch (err) {
-            console.error(`[VERIFY] Failed to update nickname:`, err.message);
-            logBoth('VERIFY', `Failed to update nickname: ${err.message}`, logs);
-            logBoth('VERIFY', `Bot highest role: ${message.guild.members.me.roles.highest.name}`, logs);
-            logBoth('VERIFY', `User highest role: ${member.roles.highest.name}`, logs);
-            await thread.send(`⚠️ Could not update your server nickname, but I'll verify with IGN: **${ign}**`);
-          }
-
-          // Rerun verification with the provided IGN
-          logBoth('VERIFY', `Rerunning verification with IGN: ${ign}`, logs);
-          result = await verifyPlayer(ign);
-
-          if (result.error) {
-            logBoth('VERIFY', `Error on attempt ${attempts + 1}: ${result.error}`, logs);
-            attempts++;
-            if (attempts < maxAttempts) {
-              await thread.send(`❌ ${result.error}\n\nPlease try again:`);
-              continue;
-            } else {
-              await thread.send(`❌ Unable to verify your account after ${maxAttempts} attempts. A Helper will respond shortly.`);
-              await sendBotLog(message.client, `\`\`\`\n${logs.join('\n')}\n\`\`\``);
-              return;
-            }
+        if (result.error) {
+          logBoth('VERIFY', `Error on attempt ${attempts + 1}: ${result.error}`, logs);
+          attempts++;
+          if (attempts < maxAttempts) {
+            await thread.send(`❌ ${result.error}\n\nPlease try again:`);
+            continue;
           } else {
-            // Success - break out of loop
-            break;
+            await thread.send(`❌ Unable to verify your account after ${maxAttempts} attempts. A Helper will respond shortly.`);
+            await sendBotLog(message.client, `\`\`\`\n${logs.join('\n')}\n\`\`\``);
+            return;
           }
-        } catch (err) {
-          console.error(`[VERIFY] Timeout or error waiting for IGN:`, err.message);
-          logBoth('VERIFY', `Timeout or error waiting for IGN: ${err.message}`, logs);
-          await thread.send('⏱️ Verification timed out. Please try again by posting another message.');
-          await sendBotLog(message.client, `\`\`\`\n${logs.join('\n')}\n\`\`\``);
-          return;
+        } else {
+          // Success - break out of loop
+          break;
         }
+      } catch (err) {
+        console.error(`[VERIFY] Timeout or error waiting for IGN:`, err.message);
+        logBoth('VERIFY', `Timeout or error waiting for IGN: ${err.message}`, logs);
+        await thread.send('⏱️ Verification timed out. Please try again by posting another message.');
+        await sendBotLog(message.client, `\`\`\`\n${logs.join('\n')}\n\`\`\``);
+        return;
       }
+    }
+
+    // Update their server nickname with the verified IGN
+    try {
+      await member.setNickname(ign);
+      logBoth('VERIFY', `Updated nickname to: ${ign}`, logs);
+    } catch (err) {
+      console.error(`[VERIFY] Failed to update nickname:`, err.message);
+      logBoth('VERIFY', `Failed to update nickname: ${err.message}`, logs);
+      logBoth('VERIFY', `Bot highest role: ${message.guild.members.me.roles.highest.name}`, logs);
+      logBoth('VERIFY', `User highest role: ${member.roles.highest.name}`, logs);
     }
 
     // Handle verification result
