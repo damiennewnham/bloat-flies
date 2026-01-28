@@ -39,7 +39,7 @@ export default {
     const overall = data.skills?.overall;
 
     const embed = new EmbedBuilder()
-      .setTitle(`� Stats for ${player.name}`)
+      .setTitle(`Stats for ${player.name}`)
       .setColor(0x1abc9c)
       .addFields(
         { name: 'Mode', value: player.mode, inline: true },

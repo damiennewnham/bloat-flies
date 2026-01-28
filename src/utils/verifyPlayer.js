@@ -88,7 +88,7 @@ export async function verifyPlayer(username) {
 
   // Build embed
   const embed = new EmbedBuilder()
-    .setTitle(`� ${player.name} Verification`)
+    .setTitle(`${player.name} Verification`)
     .setColor(failed.length === 0 ? 0x57f287 : 0xed4245) // green if passed, red if failed
     .addFields(
       { name: 'Status', value: failed.length === 0 ? '✅ HMT Ready' : '❌ Failed' },

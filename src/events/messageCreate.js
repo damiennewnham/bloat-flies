@@ -162,7 +162,7 @@ export default {
     // If passed, notify helper
     if (result.success) {
       logBoth('VERIFY', `Player passed! Notifying Helper`, logs);
-      await thread.send(`✅ Stats and KC verified! A Helper will check your gear screenshot asap.`);
+      await thread.send(`✅ Stats and KC verified! A Helper will check your gear shortly!`);
       await sendBotLog(message.client, `✅ **${result.playerName}** (${message.author.username}) - PASSED\n\`\`\`\n${logs.join('\n')}\n\`\`\``);
     } else {
       logBoth('VERIFY', `Player failed verification`, logs);
