@@ -166,7 +166,7 @@ export default {
       await sendBotLog(message.client, `✅ **${result.playerName}** (${message.author.username}) - PASSED\n\`\`\`\n${logs.join('\n')}\n\`\`\``);
     } else {
       logBoth('VERIFY', `Player failed verification`, logs);
-      await thread.send(`❌ Unfortunately you don't meet the HMT requirements:\n\n${result.failedRequirements.map(req => `• ${req}`).join('\n')}`);
+      await thread.send(`❌ Unfortunately you don't meet the HMT requirements.`);
       await sendBotLog(message.client, `❌ **${result.playerName}** (${message.author.username}) - FAILED\n\`\`\`\n${logs.join('\n')}\n\`\`\``);
     }
   }
