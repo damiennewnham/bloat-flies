@@ -89,8 +89,8 @@ export default {
     // If passed, add full stats info
     if (failed.length === 0) {
       embed.addFields(
-        { name: 'TOB KC (Normal)', value: tobKCNormal.toString(), inline: true },
-        { name: 'TOB KC (Hard)', value: tobKCHard.toString(), inline: true },
+        { name: 'ToB KC', value: tobKCNormal.toString(), inline: true },
+        { name: 'HMT KC', value: tobKCHard.toString(), inline: true },
       );
     }
 
