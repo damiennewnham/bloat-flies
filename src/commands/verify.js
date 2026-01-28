@@ -73,7 +73,7 @@ export default {
     const totalTOBKC = tobKCNormal + tobKCHard;
 
     if (totalTOBKC < 100) {
-      failed.push(`TOB KC (${totalTOBKC} / 100)`);
+      failed.push(`ToB/HMT KC (${totalTOBKC} / 100)`);
     }
 
     // Build embed
@@ -81,7 +81,7 @@ export default {
       .setTitle(`🦆 ${player.name} Verification`)
       .setColor(failed.length === 0 ? 0x57f287 : 0xed4245) // green if passed, red if failed
       .addFields(
-        { name: 'Status', value: failed.length === 0 ? '✅ PASSED' : '❌ FAILED' },
+        { name: 'Status', value: failed.length === 0 ? '✅ HMT Ready' : '❌ Not HMT Ready' },
         { name: 'Missing Requirements', value: failed.length ? failed.join('\n') : 'None' },
 
       );
