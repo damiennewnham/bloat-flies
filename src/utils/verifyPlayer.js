@@ -110,6 +110,7 @@ export async function verifyPlayer(username) {
     success: failed.length === 0,
     embed: embed,
     playerName: player.name,
-    hasFailed: failed.length > 0
+    hasFailed: failed.length > 0,
+    failedRequirements: failed
   };
 }
