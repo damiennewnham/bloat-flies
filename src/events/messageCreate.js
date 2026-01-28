@@ -168,7 +168,7 @@ export default {
       
       // Check runewatch status
       logBoth('VERIFY', `Checking RuneWatch for ${result.playerName}`, logs);
-      const rwCheck = await checkRunewatch(thread, result.playerName, message.client);
+      const rwCheck = await checkRunewatch(result.playerName);
       
       if (rwCheck.onList) {
         logBoth('VERIFY', `⚠️ ${result.playerName} is FLAGGED on RuneWatch`, logs);

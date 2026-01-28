@@ -1,46 +1,39 @@
-// Check runewatch status by running /rw command
-export async function checkRunewatch(thread, playerIGN, client) {
+// Check runewatch status via HTTP request
+export async function checkRunewatch(playerIGN) {
   try {
     console.log(`[RUNEWATCH] Checking ${playerIGN} against RuneWatch...`);
     
-    // Send the /rw command
-    const rwCommand = await thread.send(`/rw ${playerIGN}`);
-    
-    // Wait for TwistyBot's response (up to 5 seconds)
-    const responses = await thread.awaitMessages({
-      filter: m => m.author.username === 'TwistyBot' || m.author.id === '628306124674588672', // TwistyBot's common ID
-      max: 1,
-      time: 5000,
-      errors: []
+    // Try querying RuneWatch API/endpoint
+    const encodedIGN = encodeURIComponent(playerIGN);
+    const response = await fetch(`https://runewatch.com/api/player/${encodedIGN}`, {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
     });
     
-    if (responses.size === 0) {
-      console.log(`[RUNEWATCH] No response from TwistyBot`);
-      return { onList: false, message: null };
+    if (!response.ok) {
+      console.log(`[RUNEWATCH] Player not found or API error (${response.status})`);
+      return { onList: false, data: null };
     }
     
-    const response = responses.first();
-    const content = response.content;
+    const data = await response.json();
     
-    // Check if player is not found (meaning they're clean)
-    if (content.includes('Player not found')) {
-      console.log(`[RUNEWATCH] ${playerIGN} - Player not found (CLEAN)`);
-      return { onList: false, message: null };
-    }
-    
-    // If message contains details, they're on the list
-    if (response.embeds && response.embeds.length > 0) {
+    // If we get data, player is flagged
+    if (data && (data.cases || data.length > 0)) {
       console.log(`[RUNEWATCH] ${playerIGN} - FLAGGED on RuneWatch`);
       return { 
         onList: true, 
-        message: response,
-        embed: response.embeds[0]
+        data: data
       };
     }
     
-    return { onList: false, message: null };
+    console.log(`[RUNEWATCH] ${playerIGN} - Clean on RuneWatch`);
+    return { onList: false, data: null };
   } catch (err) {
     console.error(`[RUNEWATCH] Error checking RuneWatch:`, err.message);
-    return { onList: false, message: null };
+    // If request fails, assume clean (don't block verification)
+    return { onList: false, data: null };
   }
 }
+
