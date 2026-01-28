@@ -11,13 +11,17 @@ export const requirements = {
 };
 
 export async function verifyPlayer(username) {
+<<<<<<< HEAD
   console.log(`[HISCORES] Fetching stats for: ${username}`);
+=======
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
   let player;
 
   // Retry logic for temporary hiscores downtime
   for (let i = 0; i < 2; i++) {
     try {
       player = await getStats(username);
+<<<<<<< HEAD
       console.log(`[HISCORES] Successfully fetched stats for ${username}`);
       break;
     } catch (err) {
@@ -26,12 +30,23 @@ export async function verifyPlayer(username) {
         await new Promise(res => setTimeout(res, 2000)); // wait 2s before retry
       } else if (err instanceof PlayerNotFoundError) {
         console.log(`[HISCORES] Player not found: ${username}`);
+=======
+      break;
+    } catch (err) {
+      if (err instanceof HiScoresError) {
+        await new Promise(res => setTimeout(res, 2000)); // wait 2s before retry
+      } else if (err instanceof PlayerNotFoundError) {
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
         return {
           success: false,
           error: `❌ Player **${username}** not found on OSRS hiscores.`
         };
       } else {
+<<<<<<< HEAD
         console.error(`[HISCORES] Unexpected error:`, err.message);
+=======
+        console.error(err);
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
         return {
           success: false,
           error: '💀 Failed to fetch stats for this player.'
@@ -41,7 +56,10 @@ export async function verifyPlayer(username) {
   }
 
   if (!player) {
+<<<<<<< HEAD
     console.log(`[HISCORES] Hiscores temporarily unavailable for ${username}`);
+=======
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
     return {
       success: false,
       error: '⏳ OSRS hiscores are temporarily unavailable. Please try again later.'
@@ -50,7 +68,10 @@ export async function verifyPlayer(username) {
 
   const data = player[player.mode];
   if (!data?.skills || !data?.bosses) {
+<<<<<<< HEAD
     console.log(`[HISCORES] Could not read stats data for ${username}`);
+=======
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
     return {
       success: false,
       error: `⚠️ Could not read stats for **${username}**`
@@ -65,10 +86,14 @@ export async function verifyPlayer(username) {
     const level = data.skills[skill]?.level ?? 0;
     skillInfo[skill] = level;
     if (level < required) {
+<<<<<<< HEAD
       console.log(`[CHECK] ${skill}: ${level}/${required} ❌`);
       failed.push(`${skill.charAt(0).toUpperCase() + skill.slice(1)} (${level} / ${required})`);
     } else {
       console.log(`[CHECK] ${skill}: ${level}/${required} ✅`);
+=======
+      failed.push(`${skill.charAt(0).toUpperCase() + skill.slice(1)} (${level} / ${required})`);
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
     }
   }
 
@@ -77,6 +102,7 @@ export async function verifyPlayer(username) {
   const tobKCHard = data.bosses?.theatreOfBloodHardMode?.score ?? 0;
   const totalTOBKC = tobKCNormal + tobKCHard;
 
+<<<<<<< HEAD
   console.log(`[CHECK] TOB KC: ${totalTOBKC} (Normal: ${tobKCNormal}, Hard: ${tobKCHard})`);
 
   if (totalTOBKC < 100) {
@@ -84,6 +110,10 @@ export async function verifyPlayer(username) {
     failed.push(`ToB/HMT KC (${totalTOBKC} / 100)`);
   } else {
     console.log(`[CHECK] TOB KC: ${totalTOBKC}/100 ✅`);
+=======
+  if (totalTOBKC < 100) {
+    failed.push(`ToB/HMT KC (${totalTOBKC} / 100)`);
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
   }
 
   // Build embed
@@ -101,9 +131,12 @@ export async function verifyPlayer(username) {
       { name: 'ToB KC', value: tobKCNormal.toString(), inline: true },
       { name: 'HMT KC', value: tobKCHard.toString(), inline: true }
     );
+<<<<<<< HEAD
     console.log(`[RESULT] ✅ ${player.name} PASSED HMT verification`);
   } else {
     console.log(`[RESULT] ❌ ${player.name} FAILED HMT verification - Missing: ${failed.join(', ')}`);
+=======
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
   }
 
   return {

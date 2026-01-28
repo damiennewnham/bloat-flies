@@ -1,5 +1,6 @@
 import { ChannelType } from 'discord.js';
 import { verifyPlayer } from '../utils/verifyPlayer.js';
+<<<<<<< HEAD
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -7,6 +8,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, '../config.json'), 'utf-8'));
+=======
+import config from '../config.json' assert { type: 'json' };
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
 
 const HELPER_ROLE_ID = config.roles.helper;
 const VERIFY_CHANNELS = [config.channels.verify, config.channels.test];
@@ -21,6 +25,7 @@ export default {
     if (!message.guild) return;
 
     // Only process in allowed channels
+<<<<<<< HEAD
     if (!VERIFY_CHANNELS.includes(message.channelId)) {
       console.log(`[VERIFY] Ignored message in channel ${message.channelId} (not in verify/test channels)`);
       return;
@@ -40,29 +45,51 @@ export default {
     }
 
     console.log(`[VERIFY] Processing verification for ${message.author.username} in channel ${message.channelId}`);
+=======
+    if (!VERIFY_CHANNELS.includes(message.channelId)) return;
+
+    // Only process if message has attachments (images)
+    if (!message.attachments || message.attachments.size === 0) return;
+
+    // Check if any attachment is an image
+    const hasImage = message.attachments.some(att => att.contentType?.startsWith('image/'));
+    if (!hasImage) return;
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
 
     // Get the user's server nickname or username
     const member = await message.guild.members.fetch(message.author.id);
     let displayName = member.nickname || message.author.username;
+<<<<<<< HEAD
     console.log(`[VERIFY] Discord name: ${displayName}`);
+=======
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
 
     // Create a thread for verification
     const thread = await message.startThread({
       name: `Verifying ${displayName}`,
       autoArchiveDuration: 1440 // 24 hours
     });
+<<<<<<< HEAD
     console.log(`[VERIFY] Created thread: ${thread.id}`);
+=======
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
 
     // Send initial message
     await thread.send(`⏳ Verifying **${displayName}**...`);
 
     // Try to verify with their Discord name/nickname
+<<<<<<< HEAD
     console.log(`[VERIFY] Attempting verification with Discord name: ${displayName}`);
+=======
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
     let result = await verifyPlayer(displayName);
 
     // If not found, ask for IGN
     if (result.error && result.error.includes('not found')) {
+<<<<<<< HEAD
       console.log(`[VERIFY] Player not found as ${displayName}, requesting IGN`);
+=======
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
       await thread.send(
         `${message.author} Could not find your stats as **${displayName}**. Please reply with your OSRS IGN:`
       );
@@ -77,18 +104,27 @@ export default {
         });
 
         const ign = collected.first().content.trim();
+<<<<<<< HEAD
         console.log(`[VERIFY] Received IGN: ${ign}`);
+=======
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
 
         // Update their server nickname
         try {
           await member.setNickname(ign);
+<<<<<<< HEAD
           console.log(`[VERIFY] Updated nickname to: ${ign}`);
         } catch (err) {
           console.error(`[VERIFY] Failed to update nickname:`, err.message);
+=======
+        } catch (err) {
+          console.error('Failed to update nickname:', err);
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
           await thread.send(`⚠️ Could not update your server nickname, but I'll verify with IGN: **${ign}**`);
         }
 
         // Rerun verification with the provided IGN
+<<<<<<< HEAD
         console.log(`[VERIFY] Rerunning verification with IGN: ${ign}`);
         result = await verifyPlayer(ign);
 
@@ -98,24 +134,39 @@ export default {
         }
       } catch (err) {
         console.error(`[VERIFY] Timeout or error waiting for IGN:`, err.message);
+=======
+        result = await verifyPlayer(ign);
+
+        if (result.error) {
+          return await thread.send(result.error);
+        }
+      } catch (err) {
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
         return await thread.send('⏱️ Verification timed out. Please try again by posting another message.');
       }
     }
 
     // Handle verification result
     if (result.error) {
+<<<<<<< HEAD
       console.log(`[VERIFY] Verification error:`, result.error);
+=======
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
       return await thread.send(result.error);
     }
 
     // Send the verification embed
     const response = await thread.send({ embeds: [result.embed] });
+<<<<<<< HEAD
     console.log(`[VERIFY] Sent verification embed - Status: ${result.success ? 'PASSED' : 'FAILED'}`);
+=======
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
 
     // If passed, ping the helper role
     if (result.success) {
       const helperRole = await message.guild.roles.fetch(HELPER_ROLE_ID);
       if (helperRole) {
+<<<<<<< HEAD
         console.log(`[VERIFY] Player passed! Pinging Helper role`);
         await thread.send(`${helperRole} - ${message.author} is ready for HMT!`);
       } else {
@@ -123,6 +174,10 @@ export default {
       }
     } else {
       console.log(`[VERIFY] Player failed verification`);
+=======
+        await thread.send(`${helperRole} - ${message.author} is ready for HMT!`);
+      }
+>>>>>>> 7fd132903a98921ed3216705f61f6663fee41068
     }
   }
 };
