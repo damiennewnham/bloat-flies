@@ -91,8 +91,7 @@ export async function verifyPlayer(username) {
     .setTitle(`${player.name} Verification`)
     .setColor(failed.length === 0 ? 0x57f287 : 0xed4245) // green if passed, red if failed
     .addFields(
-      { name: 'Status', value: failed.length === 0 ? '✅ HMT Ready' : '❌ Failed' },
-      { name: 'Missing Requirements', value: failed.length ? failed.join('\n') : 'None' }
+      { name: 'Status', value: failed.length === 0 ? '✅ HMT Ready' : '❌ Failed' }
     );
 
   // If passed, add full stats info
