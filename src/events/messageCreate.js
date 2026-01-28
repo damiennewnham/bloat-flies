@@ -82,9 +82,9 @@ export default {
     logBoth('VERIFY', `Attempting verification with Discord name: ${displayName}`, logs);
     let result = await verifyPlayer(displayName);
 
-    // If not found, ask for IGN
-    if (result.error && result.error.includes('not found')) {
-      logBoth('VERIFY', `Player not found as ${displayName}, requesting IGN`, logs);
+    // If initial verification fails, ask for IGN
+    if (result.error) {
+      logBoth('VERIFY', `Verification failed with Discord name, requesting IGN`, logs);
       
       let attempts = 0;
       const maxAttempts = 2;
